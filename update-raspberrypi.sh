@@ -35,19 +35,19 @@ if [ $(grep -c "/etc/squid3/squid.local.conf" /etc/squid3/squid.conf) -eq 0 ] ; 
 echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 fi
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/autorun.sh -O /home/$DISP_USER/autorun.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /home/$DISP_USER/autorun.sh
 chmod u+x /home/$DISP_USER/autorun.sh
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
 chmod u+x /home/$DISP_USER/bin/connectivity.sh
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/omxplayer -O /home/$DISP_USER/bin/omxplayer
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/omxplayer -O /home/$DISP_USER/bin/omxplayer
 chmod u+x /home/$DISP_USER/bin/omxplayer
 
 sudo -u $DISP_USER wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /home/$DISP_USER/bin/httpPrefetch
 chmod u+x /home/$DISP_USER/bin/httpPrefetch
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
 chmod u+x /home/$DISP_USER/update-raspberrypi.sh
 
 reboot

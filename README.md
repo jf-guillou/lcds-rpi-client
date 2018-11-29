@@ -8,24 +8,24 @@ The client part requires a little more configuration due to the wonky video hard
 
 ### Client installation
 
-I recommend using the [minibian](https://minibianpi.wordpress.com/) OS. Trimmed of unused libraries and still fully compatible with Raspbian apps.
+I recommend using [Raspbian Lite](https://www.raspberrypi.org/downloads/raspbian/), a console-based OS with minimal dependencies : [direct download](https://downloads.raspberrypi.org/raspbian_lite_latest).
+Since we're going to install our own lightweight desktop environment, this is the most optimal solution, although it'll be a long install process.
+The latest tested version is Stretch, but anything will work with some dependencies updates.
 
-As of today, the latest version is [Minibian 2016-03-12](https://minibianpi.wordpress.com/2016/03/12/minibian-2016-03-12-is-out/), [direct download](https://sourceforge.net/projects/minibian/files/2016-03-12-jessie-minibian.tar.gz/download)
-
-- Burn this image on a 4Gb or more µSD card using the [appropriate tool](https://minibianpi.wordpress.com/setup/)
+- Burn this image on a 4Gb or more µSD card using the [appropriate tool](https://www.raspberrypi.org/documentation/installation/installing-images/README.md)
 - Connect RPi to a screen and network (DHCP)
 - Login by SSH using root / raspberry
 - Do not forget to change root password with
   `passwd`
 - Extend the partition to fill SD card
   - Automatically : `apt update && apt install -y raspi-config && raspi-config nonint do_expand_rootfs && reboot`
-  - Manually : https://minibianpi.wordpress.com/how-to/resize-sd/
+  - Manually : https://elinux.org/RPi_Resize_Flash_Partitions
 
 ### Auto-Configuration
 
 Configuration of the Raspberry Pi can be mostly automated, beside some prompts for specific details :
 
-`wget "https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/install-raspberrypi.sh" -O - | bash -s -`
+`wget "https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/install-raspberrypi.sh" -O - | bash -s -`
 
 This will install everything and configure most options at the beginning. This whole installation can take an hour.
 
@@ -70,12 +70,11 @@ sudo -u $DISP_USER mkdir $LOGS
 
 - Install browser
 ```bash
-wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
-echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" > /etc/apt/sources.list.d/kweb.list
-apt update
-apt install omxplayer kweb youtube-dl
+wget http://steinerdatenbank.de/software/kweb-1.7.9.8.tar.gz
+tar -xzf kweb-1.7.9.8.tar.gz
+cd kweb-1.7.9.8
+./debinstall
 ```
-The kweb installer may prompt for suggested packages, you should always refuse them (N).
 
 - Configure display
 ```bash
@@ -140,15 +139,15 @@ chmod u+x /home/$DISP_USER/config.sh
 . /home/$DISP_USER/config.sh
 
 # Scripts
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/autorun.sh -O /home/$DISP_USER/autorun.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /home/$DISP_USER/autorun.sh
 chmod u+x /home/$DISP_USER/autorun.sh
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
 chmod u+x /home/$DISP_USER/update-raspberrypi.sh
 
 sudo -u $DISP_USER mkdir /home/$DISP_USER/bin
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
 chmod u+x /home/$DISP_USER/bin/connectivity.sh
 ```
 
@@ -168,7 +167,7 @@ useAudioplayer = False
 useVideoplayer = False
 " >> /usr/local/bin/kwebhelper_settings.py
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/omxplayer -O /home/$DISP_USER/bin/omxplayer
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/omxplayer -O /home/$DISP_USER/bin/omxplayer
 chmod u+x /home/$DISP_USER/bin/omxplayer
 ```
 
@@ -232,12 +231,8 @@ echo "
 auto wlan0
 allow-hotplug wlan0
 iface wlan0 inet manual" >> /etc/network/interfaces
-fi
-```
-
-- Configure network
-```bash
 sed -i s/iface\ eth0\ inet\ dhcp/iface\ eth0\ inet\ manual/ /etc/network/interfaces
+fi
 ```
 
 - Configure auto shutdown
@@ -255,5 +250,5 @@ rpi-update && reboot
 ```
 
 - Ready
-If 
+
 The browser should start, register with lcds server and display the authorization screen.

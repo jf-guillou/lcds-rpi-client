@@ -3,7 +3,7 @@ LCDS=$(whiptail --inputbox "Please input your webserver address (ie: 'https://lc
 CONFIG=$(whiptail --title "Configuration" --separate-output --checklist "Select configuration options" 0 0 0 \
   "WIFI" "Install wifi modules" OFF \
   "SQUID" "Use internal Squid caching proxy (Recommended)" ON \
-  "PREFETCHER" "Use internal prefectcher instead of XHR (Recommended)" ON 3>&1 1>&2 2>&3)
+  "PREFETCHER" "Use internal prefetcher instead of XHR (Recommended)" ON 3>&1 1>&2 2>&3)
 WIFI=0
 SQUID=0
 PREFETCHER=0
@@ -39,14 +39,19 @@ apt upgrade -y
 apt install -y rpi-update nano sudo lightdm spectrwm xserver-xorg xwit python python-tk lxterminal
 
 echo "Create autorun user"
-useradd -m -s /bin/bash -G sudo -G video $DISP_USER
+if [[ -d /home/$DISP_USER ]] ; then
+  usermod -s /bin/bash -G sudo -G video $DISP_USER
+else
+  useradd -m -s /bin/bash -G sudo -G video $DISP_USER
+fi
 sudo -u $DISP_USER mkdir $LOGS
 
 echo "Install browser"
-wget -qO - "http://bintray.com/user/downloadSubjectPublicKey?username=bintray" | sudo apt-key add -
-echo "deb http://dl.bintray.com/kusti8/chromium-rpi jessie main" > /etc/apt/sources.list.d/kweb.list
-apt update
-apt install -y omxplayer kweb youtube-dl
+cd ~
+wget http://steinerdatenbank.de/software/kweb-1.7.9.8.tar.gz
+tar -xzf kweb-1.7.9.8.tar.gz
+cd kweb-1.7.9.8
+./debinstall
 
 echo "Configure display"
 sed -i s/#autologin-user=/autologin-user=$DISP_USER/ /etc/lightdm/lightdm.conf
@@ -83,15 +88,15 @@ export LCDS=\"$LCDS\"
 chown $DISP_USER: /home/$DISP_USER/config.sh
 chmod u+x /home/$DISP_USER/config.sh
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/autorun.sh -O /home/$DISP_USER/autorun.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /home/$DISP_USER/autorun.sh
 chmod u+x /home/$DISP_USER/autorun.sh
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
 chmod u+x /home/$DISP_USER/update-raspberrypi.sh
 
 sudo -u $DISP_USER mkdir /home/$DISP_USER/bin
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
 chmod u+x /home/$DISP_USER/bin/connectivity.sh
 
 echo "Configure browser in kiosk mode"
@@ -108,7 +113,7 @@ useVideoplayer = False
 " >> /usr/local/bin/kwebhelper_settings.py
 fi
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds/master/web/tools/omxplayer -O /home/$DISP_USER/bin/omxplayer
+sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/omxplayer -O /home/$DISP_USER/bin/omxplayer
 chmod u+x /home/$DISP_USER/bin/omxplayer
 
 if [ $SQUID -eq 1 ] ; then
@@ -169,10 +174,10 @@ echo "
 auto wlan0
 allow-hotplug wlan0
 iface wlan0 inet manual" >> /etc/network/interfaces
-fi
 
 echo "Configure network"
 sed -i s/iface\ eth0\ inet\ dhcp/iface\ eth0\ inet\ manual/ /etc/network/interfaces
+fi
 
 echo "Configure auto-shutdown"
 echo "0 18 * * 1-5 $DISP_USER touch /home/$DISP_USER/turnoff_display.tmp >> $LOGS/autorun.log 2>&1
