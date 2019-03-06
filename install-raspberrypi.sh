@@ -69,25 +69,25 @@ chown $DISP_USER: /home/$DISP_USER/.spectrwm.conf
 echo "Write configuration"
 echo "# Configuration file for lcds-client
 # Logs storage
-LOGS=\"$LOGS\"
+export LOGS=\"$LOGS\"
 
 # Enable Squid
-SQUID=$SQUID # 1 or 0
+export SQUID=$SQUID # 1 or 0
 
 # Enable Wifi
-WIFI=$WIFI # 1 or 0
+export WIFI=$WIFI # 1 or 0
 
 # Use prefetcher
-PREFETCHER=$PREFETCHER # 1 or 0
+export PREFETCHER=$PREFETCHER # 1 or 0
 
 # Brower for kiosk mode
-BROWSER=\"kweb3\"
+export BROWSER=\"kweb3\"
 
 # Video player binaries. Should not be modified
-VIDEO=\"omxplayer.bin\"
+export VIDEO=\"omxplayer.bin\"
 
 # Frontend
-LCDS=\"$LCDS\"
+export LCDS=\"$LCDS\"
 " > $CONFIGFILE
 
 echo "Setup scripts"
