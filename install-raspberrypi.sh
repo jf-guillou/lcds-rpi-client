@@ -172,13 +172,9 @@ update_config=1
 " > /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 wpa_passphrase "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 chmod 600 /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
-echo "
-auto wlan0
+echo "auto wlan0
 allow-hotplug wlan0
-iface wlan0 inet manual" >> /etc/network/interfaces
-
-echo "Configure network"
-sed -i s/iface\ eth0\ inet\ dhcp/iface\ eth0\ inet\ manual/ /etc/network/interfaces
+iface wlan0 inet dhcp" > /etc/network/interfaces.d/wlan0
 fi
 
 echo "Configure auto-shutdown"
