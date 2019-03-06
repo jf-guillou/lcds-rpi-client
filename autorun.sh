@@ -1,8 +1,9 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
+CONFIGFILE=/etc/lcds-client.conf
 # Load configuration
-. ./config.sh
+. $CONFIGFILE
 
 AR_LOG=$LOGS/autorun.log
 PF_LOG=$LOGS/prefetch.log
@@ -18,10 +19,10 @@ echo "$(date "+%F %T") : Start" > $AR_LOG
 export PATH="/home/pi/bin:$PATH"
 
 # Init network and wait for connectivity
-./bin/connectivity.sh INIT &> $AR_LOG
+lcds-connectivity.sh INIT &> $AR_LOG
 
 # Continuous slow HTTP checks
-./bin/connectivity.sh &
+lcds-connectivity.sh &
 
 if [ $SQUID -eq 1 ]; then
   export http_proxy="http://localhost:3128"
@@ -29,7 +30,7 @@ fi
 
 if [ $PREFETCHER -eq 1 ]; then
   echo "$(date "+%F %T") : Starting prefetcher" >> $AR_LOG
-  ./bin/httpPrefetch &> $PF_LOG &
+  httpPrefetch &> $PF_LOG &
 
   # Wait for proper init
   sleep 2

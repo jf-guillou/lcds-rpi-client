@@ -24,7 +24,8 @@ fi
 
 # Installer configuration
 DISP_USER=pi
-LOGS="/home/$DISP_USER/logs"
+LOGS=/var/log/lcds-client/
+CONFIGFILE=/etc/lcds-client.conf
 
 whiptail --title "SECURITY WARNING" --msgbox "Remember to change root password with 'passwd' AND $DISP_USER password with 'passwd $DISP_USER' commands" 0 0 3>&1 1>&2 2>&3
 
@@ -44,7 +45,10 @@ if [[ -d /home/$DISP_USER ]] ; then
 else
   useradd -m -s /bin/bash -G sudo -G video $DISP_USER
 fi
-sudo -u $DISP_USER mkdir $LOGS
+
+echo "Prepare logs"
+mkdir $LOGS
+chown $DISP_USER $LOGS
 
 echo "Install browser"
 cd ~
@@ -58,46 +62,43 @@ sed -i s/#autologin-user=/autologin-user=$DISP_USER/ /etc/lightdm/lightdm.conf
 echo "
 disable_border        = 1
 bar_enabled           = 0
-autorun               = ws[1]:/home/$DISP_USER/autorun.sh
+autorun               = ws[1]:/usr/local/bin/lcds-autorun.sh
 " > /home/$DISP_USER/.spectrwm.conf
 chown $DISP_USER: /home/$DISP_USER/.spectrwm.conf
 
-echo "Setup scripts"
-echo "#!/bin/bash
+echo "Write configuration"
+echo "# Configuration file for lcds-client
 # Logs storage
-export LOGS=\"$LOGS\"
+LOGS=\"$LOGS\"
 
 # Enable Squid
-export SQUID=$SQUID # 1 or 0
+SQUID=$SQUID # 1 or 0
 
 # Enable Wifi
-export WIFI=$WIFI # 1 or 0
+WIFI=$WIFI # 1 or 0
 
 # Use prefetcher
-export PREFETCHER=$PREFETCHER # 1 or 0
+PREFETCHER=$PREFETCHER # 1 or 0
 
 # Brower for kiosk mode
-export BROWSER=\"kweb3\"
+BROWSER=\"kweb3\"
 
 # Video player binaries. Should not be modified
-export VIDEO=\"omxplayer.bin\"
+VIDEO=\"omxplayer.bin\"
 
 # Frontend
-export LCDS=\"$LCDS\"
-" > /home/$DISP_USER/config.sh
-chown $DISP_USER: /home/$DISP_USER/config.sh
-chmod u+x /home/$DISP_USER/config.sh
+LCDS=\"$LCDS\"
+" > $CONFIGFILE
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /home/$DISP_USER/autorun.sh
-chmod u+x /home/$DISP_USER/autorun.sh
+echo "Setup scripts"
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /usr/local/bin/lcds-autorun.sh
+chmod a+x /usr/local/bin/lcds-autorun.sh
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
-chmod u+x /home/$DISP_USER/update-raspberrypi.sh
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /usr/local/bin/lcds-update-raspberrypi.sh
+chmod a+x /usr/local/bin/lcds-update-raspberrypi.sh
 
-sudo -u $DISP_USER mkdir /home/$DISP_USER/bin
-
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
-chmod u+x /home/$DISP_USER/bin/connectivity.sh
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /usr/local/bin/lcds-connectivity.sh
+chmod a+x /usr/local/bin/lcds-connectivity.sh
 
 echo "Configure browser in kiosk mode"
 echo "-JEKR+-zbhrqfpoklgtjneduwxyavcsmi#?!.," > /home/$DISP_USER/.kweb.conf
@@ -113,6 +114,7 @@ useVideoplayer = False
 " >> /usr/local/bin/kwebhelper_settings.py
 fi
 
+sudo -u $DISP_USER mkdir /home/$DISP_USER/bin/
 sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/omxplayer -O /home/$DISP_USER/bin/omxplayer
 chmod u+x /home/$DISP_USER/bin/omxplayer
 
@@ -158,8 +160,8 @@ ln -s /usr/share/squid3/errors/force_reload/generic /usr/share/squid3/errors/for
 fi
 
 echo "Configure prefetcher"
-sudo -u $DISP_USER wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /home/$DISP_USER/bin/httpPrefetch
-chmod u+x /home/$DISP_USER/bin/httpPrefetch
+wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /usr/local/bin/httpPrefetch
+chmod a+x /usr/local/bin/httpPrefetch
 
 if [ $WIFI -eq 1 ] ; then
 echo "Configure WIFI"

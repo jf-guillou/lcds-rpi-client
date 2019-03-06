@@ -7,9 +7,12 @@ sudo rpi-update
 # Updater configuration
 DISP_USER=pi
 
-. /home/$DISP_USER/config.sh
+CONFIGFILE=/etc/lcds-client.conf
+# Load configuration
+. $CONFIGFILE
 
-killall autorun.sh
+killall lcds-autorun.sh
+killall lcds-connectivity.sh
 killall $BROWSER
 killall $VIDEO
 killall httpPrefetch
@@ -35,19 +38,19 @@ if [ $(grep -c "/etc/squid3/squid.local.conf" /etc/squid3/squid.conf) -eq 0 ] ; 
 echo "include /etc/squid3/squid.local.conf" >> /etc/squid3/squid.conf
 fi
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /home/$DISP_USER/autorun.sh
-chmod u+x /home/$DISP_USER/autorun.sh
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /usr/local/bin/lcds-autorun.sh
+chmod a+x /usr/local/bin/lcds-autorun.sh
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
-chmod u+x /home/$DISP_USER/bin/connectivity.sh
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /usr/local/bin/lcds-update-raspberrypi.sh
+chmod a+x /usr/local/bin/lcds-update-raspberrypi.sh
+
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /usr/local/bin/lcds-connectivity.sh
+chmod a+x /usr/local/bin/lcds-connectivity.sh
+
+wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /usr/local/bin/httpPrefetch
+chmod a+x /usr/local/bin/httpPrefetch
 
 sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/omxplayer -O /home/$DISP_USER/bin/omxplayer
 chmod u+x /home/$DISP_USER/bin/omxplayer
-
-sudo -u $DISP_USER wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /home/$DISP_USER/bin/httpPrefetch
-chmod u+x /home/$DISP_USER/bin/httpPrefetch
-
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
-chmod u+x /home/$DISP_USER/update-raspberrypi.sh
 
 reboot
