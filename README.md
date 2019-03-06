@@ -62,10 +62,9 @@ passwd
 - Create autostart user & set its password
 ```bash
 DISP_USER=pi
-LOGS="/home/$DISP_USER/logs"
+LOGS=/var/log/lcds-client/
 useradd -m -s /bin/bash -G sudo -G video $DISP_USER
 passwd $DISP_USER
-sudo -u $DISP_USER mkdir $LOGS
 ```
 
 - Install browser
@@ -85,7 +84,7 @@ sed -i s/#autologin-user=/autologin-user=$DISP_USER/ /etc/lightdm/lightdm.conf
 echo "
 disable_border        = 1
 bar_enabled           = 0
-autorun               = ws[1]:/home/$DISP_USER/autorun.sh
+autorun               = ws[1]:/usr/local/bin/lcds-autorun.sh
 " > /home/$DISP_USER/.spectrwm.conf
 chown $DISP_USER: /home/$DISP_USER/.spectrwm.conf
 ```
@@ -131,24 +130,20 @@ export VIDEO=\"omxplayer.bin\"
 
 # Frontend
 export LCDS=\"$LCDS\"
-" > /home/$DISP_USER/config.sh
-chown $DISP_USER: /home/$DISP_USER/config.sh
-chmod u+x /home/$DISP_USER/config.sh
+" > /etc/lcds-client.conf
 
 # Load configuration
-. /home/$DISP_USER/config.sh
+. /etc/lcds-client.conf
 
 # Scripts
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /home/$DISP_USER/autorun.sh
-chmod u+x /home/$DISP_USER/autorun.sh
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/autorun.sh -O /usr/local/bin/lcds-autorun.sh
+chmod a+x /usr/local/bin/lcds-autorun.sh
 
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /home/$DISP_USER/update-raspberrypi.sh
-chmod u+x /home/$DISP_USER/update-raspberrypi.sh
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/update-raspberrypi.sh -O /usr/local/bin/lcds-update-raspberrypi.sh
+chmod a+x /usr/local/bin/lcds-update-raspberrypi.sh
 
-sudo -u $DISP_USER mkdir /home/$DISP_USER/bin
-
-sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /home/$DISP_USER/bin/connectivity.sh
-chmod u+x /home/$DISP_USER/bin/connectivity.sh
+wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/connectivity.sh -O /usr/local/bin/lcds-connectivity.sh
+chmod a+x /usr/local/bin/lcds-connectivity.sh
 ```
 
 - Configure browser in kiosk mode
@@ -167,6 +162,7 @@ useAudioplayer = False
 useVideoplayer = False
 " >> /usr/local/bin/kwebhelper_settings.py
 
+sudo -u $DISP_USER mkdir /home/$DISP_USER/bin/
 sudo -u $DISP_USER wget https://raw.githubusercontent.com/jf-guillou/lcds-rpi-client/master/omxplayer -O /home/$DISP_USER/bin/omxplayer
 chmod u+x /home/$DISP_USER/bin/omxplayer
 ```
@@ -210,8 +206,8 @@ fi
 
 - Configure Prefetcher
 ```bash
-sudo -u $DISP_USER wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /home/$DISP_USER/bin/httpPrefetch
-chmod u+x /home/$DISP_USER/bin/httpPrefetch
+wget https://github.com/jf-guillou/httpPrefetch/releases/download/v0.1.0/httpPrefetch -O /usr/local/bin/httpPrefetch
+chmod a+x /usr/local/bin/httpPrefetch
 ```
 
 - Configure Wifi
@@ -230,8 +226,7 @@ wpa_passphrase "$SSID" "$PSK" >> /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
 echo "
 auto wlan0
 allow-hotplug wlan0
-iface wlan0 inet manual" >> /etc/network/interfaces
-sed -i s/iface\ eth0\ inet\ dhcp/iface\ eth0\ inet\ manual/ /etc/network/interfaces
+iface wlan0 inet manual" > /etc/network/interfaces.d/wlan0
 fi
 ```
 
