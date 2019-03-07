@@ -81,7 +81,7 @@ export WIFI=$WIFI # 1 or 0
 export PREFETCHER=$PREFETCHER # 1 or 0
 
 # Brower for kiosk mode
-export BROWSER=\"kweb3\"
+export BROWSER=\"kweb\"
 
 # Video player binaries. Should not be modified
 export VIDEO=\"omxplayer.bin\"
