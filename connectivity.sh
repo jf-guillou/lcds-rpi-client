@@ -25,7 +25,7 @@ if [ $# -gt 0 ] ; then
 
   echo "$(date "+%F %T") [$INT] : Wait for IP address"
   fails=0
-  while [[ $(/usr/bin/sudo /sbin/ifconfig $INT | grep -c "inet .* scope global") -eq 0 ]]
+  while [[ $(/usr/bin/sudo /sbin/ip address show dev $INT | grep -c "inet .* scope global") -eq 0 ]]
   do
     sleep 10
     ((fails++))
